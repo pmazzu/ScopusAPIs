@@ -1,0 +1,2 @@
+affiliationID|affilName|affilCity|affilCountry|ScopusIDPub|TipoPub|Title|Source|Date|Cantidad Citas|Author|AuthorID|
+114997202|CBRE Group, Inc.|No_Affil_City|United States|84923007224|Journal|Cross-border homicide impacts on economic activity in El Paso|Empirical Economics|2015-02-14|0|Nino P.|56519931600

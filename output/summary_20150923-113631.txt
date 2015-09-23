@@ -1,0 +1,3 @@
+affiliationID|affilName|affilCity|affilCountry|pubCount|totalPubPeriod|totalPub
+60009226|Colorado State University|Fort Collins|United States|1|5000|50641
+60024830|Benemerita Universidad Autonoma de Puebla|Puebla|Mexico|1|3127|6502
