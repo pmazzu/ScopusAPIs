@@ -428,8 +428,7 @@ def processInputFile(inputPath):
    
     authorList=[]
 
-    with open (notProcessed, 'a') as log:
-
+    with open (logFile, 'a') as log:
         try:
             with open (inputPath,'r') as input:
 
