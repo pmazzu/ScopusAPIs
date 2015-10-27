@@ -8,6 +8,10 @@ Created on Fri Jul 03 10:45:17 2015
 # More data about Elsevier APIs
 # http://api.elsevier.com/documentation/apis.html
 
+# para generar el ejecutable se utilizo pyinstaller, con el siguiente comando
+# pyinstaller -F .\ScopusAPIs.py
+# mas info: http://pythonhosted.org/PyInstaller/
+
 import requests
 import json
 import sys
@@ -428,7 +432,8 @@ def processInputFile(inputPath):
    
     authorList=[]
 
-    with open (logFile, 'a') as log:
+    with open (notProcessed, 'a') as log:
+
         try:
             with open (inputPath,'r') as input:
 
@@ -778,6 +783,8 @@ def optionHandler(opcion):
             query="AU-ID(" + author.strip() + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
             obtainAndProcessPublic(query)
 
+        affiliationStatistics()
+
     elif opcion==2:
         query="((AFFIL(tecnológico de monterrey)OR+AFFIL(itesm))OR+AFFIL(hosp* san josé tec* monterrey))AND+NOT((AF-ID(60018640)))+OR+(AF-ID(60007966))AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
         obtainAndProcessPublic(query)
@@ -798,10 +805,10 @@ def optionHandler(opcion):
 def obtainAndProcessPublic(query):
 
     global executionMode
-    global affilCity
-    global affilCountry
-    global affilName
-    global affilCount
+    # global affilCity
+    # global affilCountry
+    # global affilName
+    # global affilCount
 
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
@@ -817,44 +824,95 @@ def obtainAndProcessPublic(query):
             scopusPubsIDs_filtered=removeDuplicates(scopusPubsIDs) # duplicates publications are removed to avoid calling the API multiple times looking for a publication that already was retrieved
             processPublications(scopusPubsIDs_filtered) # All the info from the publications is extracted, formatted and saved in a file
             
-        # Process the affiliation info collected in processPublications(), to create a summary of the 
-        # collaboration with other universities/research centers
-        try:
-            with open (summary, 'w') as su:    
+        # # Process the affiliation info collected in processPublications(), to create a summary of the 
+        # # collaboration with other universities/research centers
+        # try:
+        #     with open (summary, 'w') as su:    
 
-                su.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'pubCount' + '|' + 'totalPubPeriod' + '|' +'totalPub' + '\n')
-                sstring = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}|{counterPub}|{totalPubPeriod}|{totalPub}'
+        #         su.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'pubCount' + '|' + 'totalPubPeriod' + '|' +'totalPub' + '\n')
+        #         sstring = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}|{counterPub}|{totalPubPeriod}|{totalPub}'
 
-                for id, count in affilCount.iteritems():
+        #         for id, count in affilCount.iteritems():
                     
-                    affName=affilName[id]
-                    affCity=affilCity[id]
-                    affCountry=affilCountry[id]
-                    countPub=count
+        #             affName=affilName[id]
+        #             affCity=affilCity[id]
+        #             affCountry=affilCountry[id]
+        #             countPub=count
 
-                    totalPublicationsSamePeriod=getAmountOfPubsByAffilInaPeriod(id,"0")
+        #             totalPublicationsSamePeriod=getAmountOfPubsByAffilInaPeriod(id,"0")
 
-                    totalPublications=processAffilResults(affiliationSearchAPI(id))
+        #             totalPublications=processAffilResults(affiliationSearchAPI(id))
 
-                    s = sstring.format(affiliationID = id,
-                                           affilName = affName, 
-                                           affilCity = affCity,
-                                        affilCountry = affCountry,
-                                          counterPub = countPub,
-                                    totalPubPeriod   = totalPublicationsSamePeriod,
-                                          totalPub   = totalPublications)
+        #             s = sstring.format(affiliationID = id,
+        #                                    affilName = affName, 
+        #                                    affilCity = affCity,
+        #                                 affilCountry = affCountry,
+        #                                   counterPub = countPub,
+        #                             totalPubPeriod   = totalPublicationsSamePeriod,
+        #                                   totalPub   = totalPublications)
 
-                    su.write(s +'\n')
+        #             su.write(s +'\n')
 
-        except IOError as e:
+        # except IOError as e:
 
-            if executionMode=="RUN":
-                with open(logFile,"a") as log:
-                    log.write('Operation failed at: [%s] - [%s] - [%s] ' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
+        #     if executionMode=="RUN":
+        #         with open(logFile,"a") as log:
+        #             log.write('Operation failed at: [%s] - [%s] - [%s] ' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
 
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
             debugFile.write("salí de: [%s] - [%s]\n" % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
+
+    return
+
+##############################################################################################
+# Description: The function return the amount of publication linked to an affiliation in a
+#              respective period of time
+# Input: id of the affiliation
+# Output: amount of publications in a period of time
+##############################################################################################
+
+def affiliationStatistics():
+
+    global affilCity
+    global affilCountry
+    global affilName
+    global affilCount
+
+    # Process the affiliation info collected in processPublications(), to create a summary of the 
+    # collaboration with other universities/research centers
+    try:
+        with open (summary, 'w') as su:    
+
+            su.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'pubCount' + '|' + 'totalPubPeriod' + '|' +'totalPub' + '\n')
+            sstring = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}|{counterPub}|{totalPubPeriod}|{totalPub}'
+
+            for id, count in affilCount.iteritems():
+                
+                affName=affilName[id]
+                affCity=affilCity[id]
+                affCountry=affilCountry[id]
+                countPub=count
+
+                totalPublicationsSamePeriod=getAmountOfPubsByAffilInaPeriod(id,"0")
+
+                totalPublications=processAffilResults(affiliationSearchAPI(id))
+
+                s = sstring.format(affiliationID = id,
+                                       affilName = affName, 
+                                       affilCity = affCity,
+                                    affilCountry = affCountry,
+                                      counterPub = countPub,
+                                totalPubPeriod   = totalPublicationsSamePeriod,
+                                      totalPub   = totalPublications)
+
+                su.write(s +'\n')
+
+    except IOError as e:
+
+        if executionMode=="RUN":
+            with open(logFile,"a") as log:
+                log.write('Operation failed at: [%s] - [%s] - [%s] ' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
 
     return
 
