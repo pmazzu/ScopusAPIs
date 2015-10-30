@@ -29,7 +29,8 @@ def packingConfigVariables():
 
     	tecAffiliations = configParser.get('VARIABLES','tecAffiliations')
     	affiliationID=configParser.get('VARIABLES','affiliationID')
-    	yearStr=configParser.get('VARIABLES','yearStr')
+    	yearFromStr=configParser.get('VARIABLES','yearFromStr')
+    	yearToStr=configParser.get('VARIABLES','yearToStr')
     	frameSizeStr=configParser.get('VARIABLES','frameSizeStr')
 
     	configParser.remove_section('API_KEY')
@@ -38,7 +39,8 @@ def packingConfigVariables():
     else:
     	affiliationID='60007966'
     	tecAffiliations='60007966;60018640'
-        yearStr='2009'
+        yearFromStr='2009'
+        yearToStr='2015'
         frameSizeStr='200'
     
     timeStampStr = time.strftime("%Y%m%d-%H%M%S")  
@@ -60,7 +62,8 @@ def packingConfigVariables():
     configParser.set('VARIABLES', 'affiliationID', affiliationID)
     configParser.set('VARIABLES', 'tecAffiliations', tecAffiliations)
     configParser.set('VARIABLES', 'frameSizeStr', frameSizeStr)
-    configParser.set('VARIABLES', 'yearStr', yearStr)
+    configParser.set('VARIABLES', 'yearFromStr', yearFromStr)
+    configParser.set('VARIABLES', 'yearToStr', yearToStr)
 
     with open(configPath, 'wb') as configFile:
     	configParser.write(configFile)

@@ -29,7 +29,8 @@ inputPath=""
 MY_API_KEY=""
 tecAffiliations=[]
 affiliationID=""
-yearStr=""
+yearFromStr=""
+yearToStr=""
 frameSizeStr=""
 configParser=""
 limitParser=""
@@ -503,7 +504,7 @@ def getPublicationsIDsByAffiliation(affiliationID, index):
     affiliationIDStr = str(affiliationID)
     indexStr = str(index)
     
-    query = "http://api.elsevier.com/content/search/scopus?query=AF-ID(" + affiliationIDStr + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
+    query = "http://api.elsevier.com/content/search/scopus?query=AF-ID(" + affiliationIDStr + ")AND+PUBYEAR+>+"+yearFromStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
     
     resp = requests.get(query, headers={'Accept':'application/json', 'X-ELS-APIKey': MY_API_KEY})
 
@@ -629,7 +630,7 @@ def abstractRetrievalAPIFromAuthors():
     
         for author in authorList:
 
-            query="AU-ID(" + author + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
+            query="AU-ID(" + author + ")AND+PUBYEAR+>+"+yearFromStr+"&field=dc:identifier&count="+frameSizeStr
 
             results=scopusSearchAPI(query)
 
@@ -709,7 +710,7 @@ def getPublicationInfoByAffiliation(affiliationID):
                 
     while morePublications:
     
-        query="AF-ID(" + affiliationIDStr + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
+        query="AF-ID(" + affiliationIDStr + ")AND+PUBYEAR+>+"+yearFromStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
 
         results=scopusSearchAPI(query)
             
@@ -780,17 +781,21 @@ def optionHandler(opcion):
         authorList=processInputFile(inputPath)
         # Obtain each author papers
         for author in authorList:
-            query="AU-ID(" + author.strip() + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
+            query="AU-ID(" + author.strip() + ")+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
             obtainAndProcessPublic(query)
 
         affiliationStatistics()
 
     elif opcion==2:
-        query="((AFFIL(tecnológico de monterrey)OR+AFFIL(itesm))OR+AFFIL(hosp* san josé tec* monterrey))AND+NOT((AF-ID(60018640)))+OR+(AF-ID(60007966))AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
+        query="((AFFIL(tecnológico de monterrey)+OR+AFFIL(itesm))+OR+AFFIL(hosp* san josé tec* monterrey))+AND+NOT((AF-ID(60018640)))+OR+(AF-ID(60007966))+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
         obtainAndProcessPublic(query)
 
     elif opcion==3:
-        query="(AFFIL(tec de monterrey))AND+NOT((AFFIL(tecnológico de monterrey)OR+AFFIL(itesm))OR+AFFIL(hosp* san josé tec* monterrey))AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&count="+frameSizeStr
+        query="(AFFIL(tec de monterrey))+AND+NOT((AFFIL(tecnológico de monterrey)+OR+AFFIL(itesm))+OR+AFFIL(hosp* san josé tec* monterrey))+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
+        obtainAndProcessPublic(query)
+
+    elif opcion==4:
+        query="(AF-ID(60018640)+OR+AF-ID(60007966))+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
         obtainAndProcessPublic(query)
 
     return
@@ -936,7 +941,7 @@ def getAmountOfPubsByAffilInaPeriod(idAffiliation,indexStr):
 
     while(morePublications):
         amountOfPubs=0
-        query = "AF-ID(" + idAffiliation + ")AND+PUBYEAR+>+"+yearStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr  
+        query = "AF-ID(" + idAffiliation + ")AND+PUBYEAR+>+"+yearFromStr+"AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr  
         results=scopusSearchAPI(query)
 
         if results:
@@ -1206,9 +1211,10 @@ def userInterface():
     response_options = {'1': ('Proceso Semestral', "optionHandler"),
                         '2': ('Query 1', "query_1"),
                         '3': ('Query 2', "query_2"),
-                        '4': ('Exit', "exit"),    
-                        '5': ('Inicializar variables', "init_variables"),
-                        '6': ('Inicializar limites API', "init_limits")}
+                        '4': ('Publicaciones con Afiliaciones TEC', "Pubs_Afil_TEC"),
+                        '5': ('Exit', "exit"),    
+                        '6': ('Inicializar variables', "init_variables"),
+                        '7': ('Inicializar limites API', "init_limits")}
                         
     response_func = make_choice(response_options)
 
@@ -1218,6 +1224,8 @@ def userInterface():
         optionHandler(2)
     elif response_func == "query_2":
         optionHandler(3)
+    elif response_func == "Pubs_Afil_TEC":
+        optionHandler(4)
     elif response_func == "exit":
         sys.exit()
     elif response_func == "init_variables":
@@ -1264,7 +1272,8 @@ def unpackingConfigFileVariables():
     global MY_API_KEY
     global tecAffiliations
     global affiliationID
-    global yearStr
+    global yearFromStr
+    global yearToStr
     global frameSizeStr
     global configParser
     global limitParser
@@ -1285,7 +1294,8 @@ def unpackingConfigFileVariables():
     MY_API_KEY=configParser.get('API_KEY','MY_API_KEY')
     tecAffiliations = configParser.get('VARIABLES','tecAffiliations').split(";")
     affiliationID=configParser.get('VARIABLES','affiliationID')
-    yearStr=configParser.get('VARIABLES','yearStr')
+    yearFromStr=configParser.get('VARIABLES','yearFromStr')
+    yearToStr=configParser.get('VARIABLES','yearToStr')
     frameSizeStr=configParser.get('VARIABLES','frameSizeStr')
 
     return
