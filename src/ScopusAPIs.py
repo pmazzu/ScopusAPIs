@@ -20,12 +20,17 @@ import time
 import configFile
 
 outputPath=""
+scopublicaciones=""
+scoafiliaciones=""
+scoautores=""
+scopubbautafil=""
 notProcessed=""
 collab=""
 summary=""
 debugFilePath=""
 logFile=""
-inputPath=""
+inputPathAuthorsIDs=""
+inputPathPubsIDs=""
 MY_API_KEY=""
 tecAffiliations=[]
 affiliationID=""
@@ -60,7 +65,7 @@ def scopusSearchAPI(searchParameters):
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
             debugFile.write("entré en: [%s] - [%s]\n" % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
-            debugFile.write(searchParameters+"\n")
+            debugFilex|(searchParameters+"\n")
 
     query = "http://api.elsevier.com/content/search/scopus?query=" + searchParameters
 
@@ -141,6 +146,16 @@ def resultsHandler(resp,function,identif,query):
                 partialResults = json.loads(temp.encode('utf-8') )
                 if isEmpty(partialResults):
                     results={}
+                    s = fstring.format(ResultCode    = resultCode,
+                                       ErrorCode     = "",
+                                        ErrorMsg     = "Ya no se obtuvieron resultados",
+                                        FunctionName = function,
+                                        Query        = query,
+                                        Time         = time.strftime("%Y%m%d-%H%M%S"))
+                    
+                    if executionMode=="RUN":
+                        with open(logFile,"a") as log:
+                            log.write(s +"\n")
                 else:
                     results=partialResults
 
@@ -350,7 +365,7 @@ def processAffilResults(resp):
 
             if executionMode=="RUN":
                 with open(logFile,"a") as log:
-                    log.write('KeyError because: [%s] - [%s] - [%s] - [%s]' % (str(e), affilID, sys._getframe().f_code.co_name,time.strftime("%Y%m%d-%H%M%S")))
+                    log.write('KeyError because: [%s] - [%s] - [%s] - [%s]\n' % (str(e), affilID, sys._getframe().f_code.co_name,time.strftime("%Y%m%d-%H%M%S")))
 
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
@@ -431,7 +446,7 @@ def authorRetrievalAPI(SCOPUS_ID):
 
 def processInputFile(inputPath):
    
-    authorList=[]
+    listOfObjects=[]
 
     with open (notProcessed, 'a') as log:
 
@@ -439,12 +454,12 @@ def processInputFile(inputPath):
             with open (inputPath,'r') as input:
 
                 for line in input:
-                    authorList.append(line)
+                    listOfObjects.append(line)
 
-                return authorList
+                return listOfObjects
 
         except IOError as e:
-            log.write("Operation failed: %s" % e.strerror) 
+            log.write("Operation failed: %s \n" % e.strerror) 
 
 ##############################################################################################
 # Description: This function obtains the authors'IDs that belongs to a respective affiliation
@@ -540,152 +555,75 @@ def getPublicationsIDsByAffiliation(affiliationID, index):
 #         their publications, and current affiliation info
 ##############################################################################################
 
-def getListofAuthorsByAffil(affiliationID):
+def getListofAuthorsByAffil(listOfAffiliations):
         
-    unpackingConfigFileVariables()
-    affiliationIdStr= str(affiliationID)
-    index = 0
-
     with open(outputPath, 'w') as f:
         
         f.write('affiliationID' + '|'+ 'AuthorID' + '|'+ 'Name' + '|'+ 'Citations #' + '|'+ 'Documents #' + '|'+ 'Cited by' + '|'+ 'Current Affil Name' + '|'+ 'Current Affil City' + '|'+ 'Current Affil Country' + '\n')
-    
-        listOfAuthorsIDs = authorSearchAPI(affiliationIdStr, index);
                   
-        while len(listOfAuthorsIDs) > 0:
-            for sid in listOfAuthorsIDs:
-                # some entries seem to have json parse errors, so we catch those
-                try:
-                    scopusID = sid[0].split(':')[1];
-                    
-                    results = authorRetrievalAPI(scopusID)
-                   
+        for affiliationID in listOfAffiliations:
+            affiliationIdStr= str(affiliationID)
+            index = 0
+            listOfAuthorsIDs = authorSearchAPI(affiliationIdStr, index);
+
+            while len(listOfAuthorsIDs) > 0:
+                for sid in listOfAuthorsIDs:
+                    # some entries seem to have json parse errors, so we catch those
                     try:
-                        surname=results['author-retrieval-response'][0]['preferred-name']['surname'].encode('utf-8');
-                        givenName=results['author-retrieval-response'][0]['preferred-name']['given-name'].encode('utf-8');
-                        affiliation_current_name=results['author-retrieval-response'][0]['affiliation-current']['affiliation-name'].encode('utf-8');                        
-                        affiliation_current_city=results['author-retrieval-response'][0]['affiliation-current']['affiliation-city'].encode('utf-8');                        
-                        affiliation_current_country=results['author-retrieval-response'][0]['affiliation-current']['affiliation-country'].encode('utf-8');                        
-                        citation_count=int(results['author-retrieval-response'][0]['coredata']['citation-count'].encode('utf-8'))
-                        document_count=int(results['author-retrieval-response'][0]['coredata']['document-count'].encode('utf-8'))
-                        cited_by_count=int(results['author-retrieval-response'][0]['coredata']['cited-by-count'].encode('utf-8'))
+                        scopusID = sid[0].split(':')[1];
+                        
+                        results = authorRetrievalAPI(scopusID)
+                       
+                        try:
+                            surname=results['author-retrieval-response'][0]['preferred-name']['surname'].encode('utf-8');
+                            givenName=results['author-retrieval-response'][0]['preferred-name']['given-name'].encode('utf-8');
+                            affiliation_current_name=results['author-retrieval-response'][0]['affiliation-current']['affiliation-name'].encode('utf-8');                        
+                            affiliation_current_city=results['author-retrieval-response'][0]['affiliation-current']['affiliation-city'].encode('utf-8');                        
+                            affiliation_current_country=results['author-retrieval-response'][0]['affiliation-current']['affiliation-country'].encode('utf-8');                        
+                            citation_count=int(results['author-retrieval-response'][0]['coredata']['citation-count'].encode('utf-8'))
+                            document_count=int(results['author-retrieval-response'][0]['coredata']['document-count'].encode('utf-8'))
+                            cited_by_count=int(results['author-retrieval-response'][0]['coredata']['cited-by-count'].encode('utf-8'))
 
-                        name=""
-                        name = surname + ", " + givenName
-                                  
-                        fstring = '{affiliationID}|{authorID}|{preferred_name}|{citations_count}|{document_count}|{cited_by_count}|{affiliation_current_name}|{affiliation_current_city}|{affiliation_current_country}'
-        
-                        s = fstring.format(affiliationID               = affiliationIdStr,
-                                           authorID                    = scopusID,
-                                           preferred_name              = name,
-                                           citations_count             = citation_count,
-                                           document_count              = document_count,
-                                           cited_by_count              = cited_by_count,
-                                           affiliation_current_name    = affiliation_current_name,
-                                           affiliation_current_city    = affiliation_current_city,
-                                           affiliation_current_country = affiliation_current_country)
+                            name=""
+                            name = surname + ", " + givenName
+                                      
+                            fstring = '{affiliationID}|{authorID}|{preferred_name}|{citations_count}|{document_count}|{cited_by_count}|{affiliation_current_name}|{affiliation_current_city}|{affiliation_current_country}'
+            
+                            s = fstring.format(affiliationID               = affiliationIdStr,
+                                               authorID                    = scopusID,
+                                               preferred_name              = name,
+                                               citations_count             = citation_count,
+                                               document_count              = document_count,
+                                               cited_by_count              = cited_by_count,
+                                               affiliation_current_name    = affiliation_current_name,
+                                               affiliation_current_city    = affiliation_current_city,
+                                               affiliation_current_country = affiliation_current_country)
 
-                        f.write(s+'\n')
+                            f.write(s+'\n')
+
+                        except Exception:
+                            fstring = '{affiliationID}|{author}';
+                            s = fstring.format(affiliationID = affiliationIdStr, 
+                                                       author = scopusID)  
 
                     except Exception:
+            
                         fstring = '{affiliationID}|{author}';
                         s = fstring.format(affiliationID = affiliationIdStr, 
-                                                   author = scopusID)  
+                                           author = 'No se pudo recuperar este ID')
 
-                except Exception:
-        
-                    fstring = '{affiliationID}|{author}';
-                    s = fstring.format(affiliationID = affiliationIdStr, 
-                                       author = 'No se pudo recuperar este ID')
-
-                    f.write(s+'\n')
-                         
-            index = index + int(frameSizeStr)
-           
-            if len(listOfAuthorsIDs) <= index:
-                #There are more records than expected
-                listOfAuthorsIDs=[]
-            else:
-                listOfAuthorsIDs = authorSearchAPI(affiliationIdStr, index);
+                        f.write(s+'\n')
+                             
+                index = index + int(frameSizeStr)
+               
+                if len(listOfAuthorsIDs) <= index:
+                    #There are more records than expected
+                    listOfAuthorsIDs=[]
+                else:
+                    listOfAuthorsIDs = authorSearchAPI(affiliationIdStr, index);
                 
     return    
-    
-##############################################################################################
-# Description: the function get info of certain publications of the authors given as input.
-#              It uses the Scopus Search API and the Abstract Retrieval API
-# Input: list of authors, max amount of publications needed of each author and initial year
-#        the API should starts looking at (not inclusive)
-# Output: authorID, scopusID of the publication, type of publication, Title, source, date
-#         amount of citations
-##############################################################################################
-
-def abstractRetrievalAPIFromAuthors():           
-    
-    unpackingConfigFileVariables()
-    authorList = processInputFile(inputPath)
-    
-    with open(outputPath, 'w') as f:
-    
-        f.write('AuthorID' + '|'+ 'ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Fecha'+ '|'+'Cantidad Citas'+'\n')
-    
-        for author in authorList:
-
-            query="AU-ID(" + author + ")AND+PUBYEAR+>+"+yearFromStr+"&field=dc:identifier&count="+frameSizeStr
-
-            results=scopusSearchAPI(query)
-
-            if results:
-                scopus_ids = getListOfPublications(results)
-            else:
-                scopus_ids = []
-            
-            if  len(scopus_ids) > 0:  
-                i = 0
-                for sid in scopus_ids:
-                    # some entries seem to have json parse errors, so we catch those
-                    try:            
-                        scopusID = sid.split(':')[1]
-        
-                        results = abstractRetrievalAPI(scopusID)
-
-                        i += 1
-                        
-                        fstring = '{author}|{ScopusIDPub}|{TipoPub}|{title}|{journal}|{date}|{cites}'
-
-                        TipoPub = results['abstracts-retrieval-response']['coredata']['prism:aggregationType'];
-                        #authors=', '.join([au['ce:indexed-name'].encode('utf-8') for au in results['abstracts-retrieval-response']['authors']['author']]);
-                        title=results['abstracts-retrieval-response']['coredata']['dc:title'].encode('utf-8');
-                        journal=results['abstracts-retrieval-response']['coredata']['prism:publicationName'].encode('utf-8');
-                        date=results['abstracts-retrieval-response']['coredata']['prism:coverDate'].encode('utf-8');
-                        cites=int(results['abstracts-retrieval-response']['coredata']['citedby-count'].encode('utf-8'))
-
-                        s = fstring.format(author = author, 
-                                           ScopusIDPub = scopusID,
-                                           TipoPub = TipoPub,
-                                           #authors=authors,
-                                           title=title,
-                                           journal=journal,
-                                           date=date,
-                                           cites=cites)
-
-                        f.write(s+'\n')
-                        
-                    except:
-            
-                        fstring = '{author}|{ScopusIDPub}'
-                        s = fstring.format(author = author, 
-                                           ScopusIDPub = scopusID)
-
-                        f.write(s+'\n')
-            else:
-                i = 0;
-                fstring = '{author}'
-                s = fstring.format(author = author)
-
-                f.write(s+'\n')
-        
-    return
-    
+      
  ##############################################################################################
 # Description: the function get info of certain publications published using the affiliation
 #              given as parameter.  It uses the Scopus Search API and the Abstract Retrieval API 
@@ -693,24 +631,19 @@ def abstractRetrievalAPIFromAuthors():
 # Output: affiliation info, publication info and authors info
 ##############################################################################################   
     
-def getPublicationInfoByAffiliation(affiliationID):
+def getPublicationInfoByAffiliation(queryConditions, indexStr, frameSizeStr):
 
     global executionMode
-
-    unpackingConfigFileVariables()
+    global processFirstPublications
+    morePublications=True
     
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
             debugFile.write("entré en: [%s] - [%s]\n" % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
-
-    indexStr = "0"
-    affiliationIDStr = str(affiliationID)
-    global processFirstPublications
-    morePublications=True
                 
     while morePublications:
     
-        query="AF-ID(" + affiliationIDStr + ")AND+PUBYEAR+>+"+yearFromStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
+        query=queryConditions+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr
 
         results=scopusSearchAPI(query)
             
@@ -723,6 +656,9 @@ def getPublicationInfoByAffiliation(affiliationID):
                 morePublications=False
 
             processPublications(scopusPubsIDs)
+
+        else:
+            morePublications=False
     
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
@@ -759,6 +695,26 @@ def removeDuplicates(scopusPubsIDs):
 
     return scopusPubsIDs_filtered
 
+
+ ##############################################################################################
+# Description: 
+# Input: 
+# Output: 
+############################################################################################## 
+
+def transformAffilIntoScopusFormat(tecaffiliations):
+
+    firstTime=True
+
+    for affiliation in tecaffiliations:
+        if firstTime:
+            firstTime=False
+            affilToScopus="AF-ID("+affiliation+")"
+        else:
+            affilToScopus=affilToScopus+"+OR+AF-ID("+affiliation+")"
+
+    return affilToScopus
+
  ##############################################################################################
 # Description: 
 # Input: 
@@ -768,6 +724,7 @@ def removeDuplicates(scopusPubsIDs):
 def optionHandler(opcion):
 
     global executionMode
+    global tecAffiliations
 
     # The needed variables are uploaded in memory
     unpackingConfigFileVariables()
@@ -778,7 +735,7 @@ def optionHandler(opcion):
 
     if opcion==1:
         # Obtain the list of authors 
-        authorList=processInputFile(inputPath)
+        authorList=processInputFile(inputPathAuthorsIDs)
         # Obtain each author papers
         for author in authorList:
             query="AU-ID(" + author.strip() + ")+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
@@ -795,8 +752,22 @@ def optionHandler(opcion):
         obtainAndProcessPublic(query)
 
     elif opcion==4:
-        query="(AF-ID(60018640)+OR+AF-ID(60007966))+AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&count="+frameSizeStr
-        obtainAndProcessPublic(query)
+        affilParameters=transformAffilIntoScopusFormat(tecAffiliations)
+        queryParameters=affilParameters+"+ AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr
+        getPublicationInfoByAffiliation(queryParameters, "0", frameSizeStr)
+
+    elif opcion==5:
+        queryParameters=transformAffilIntoScopusFormat(tecAffiliations)
+        getPublicationInfoByAffiliation(queryParameters, "0", frameSizeStr)
+
+    elif opcion==6:
+        # Obtain list of SCOPUS ID of the publications
+        pubList=processInputFile(inputPathPubsIDs)
+        processPublications(pubList)
+
+    elif opcion==7:
+        getListofAuthorsByAffil(tecAffiliations)
+        
 
     return
 
@@ -810,10 +781,6 @@ def optionHandler(opcion):
 def obtainAndProcessPublic(query):
 
     global executionMode
-    # global affilCity
-    # global affilCountry
-    # global affilName
-    # global affilCount
 
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
@@ -829,41 +796,6 @@ def obtainAndProcessPublic(query):
             scopusPubsIDs_filtered=removeDuplicates(scopusPubsIDs) # duplicates publications are removed to avoid calling the API multiple times looking for a publication that already was retrieved
             processPublications(scopusPubsIDs_filtered) # All the info from the publications is extracted, formatted and saved in a file
             
-        # # Process the affiliation info collected in processPublications(), to create a summary of the 
-        # # collaboration with other universities/research centers
-        # try:
-        #     with open (summary, 'w') as su:    
-
-        #         su.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'pubCount' + '|' + 'totalPubPeriod' + '|' +'totalPub' + '\n')
-        #         sstring = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}|{counterPub}|{totalPubPeriod}|{totalPub}'
-
-        #         for id, count in affilCount.iteritems():
-                    
-        #             affName=affilName[id]
-        #             affCity=affilCity[id]
-        #             affCountry=affilCountry[id]
-        #             countPub=count
-
-        #             totalPublicationsSamePeriod=getAmountOfPubsByAffilInaPeriod(id,"0")
-
-        #             totalPublications=processAffilResults(affiliationSearchAPI(id))
-
-        #             s = sstring.format(affiliationID = id,
-        #                                    affilName = affName, 
-        #                                    affilCity = affCity,
-        #                                 affilCountry = affCountry,
-        #                                   counterPub = countPub,
-        #                             totalPubPeriod   = totalPublicationsSamePeriod,
-        #                                   totalPub   = totalPublications)
-
-        #             su.write(s +'\n')
-
-        # except IOError as e:
-
-        #     if executionMode=="RUN":
-        #         with open(logFile,"a") as log:
-        #             log.write('Operation failed at: [%s] - [%s] - [%s] ' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
-
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
             debugFile.write("salí de: [%s] - [%s]\n" % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
@@ -917,7 +849,7 @@ def affiliationStatistics():
 
         if executionMode=="RUN":
             with open(logFile,"a") as log:
-                log.write('Operation failed at: [%s] - [%s] - [%s] ' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
+                log.write('Operation failed at: [%s] - [%s] - [%s]\n' % (sys._getframe().f_code.co_name, e.strerror, time.strftime("%Y%m%d-%H%M%S")))
 
     return
 
@@ -988,15 +920,23 @@ def processPublications(scopusPubsIDs):
         mode='a'
 
     try:
-        with open (outputPath, mode) as f, open (notProcessed, mode) as l, open (collab, mode) as c:
+        with open (scopubbautafil, mode) as f1, open (scoautores, mode) as f2, open (scoafiliaciones, mode) as f3, open (scopublicaciones, mode) as f4, open (notProcessed, mode) as l, open (collab, mode) as c:
         
             # First time header is written
             if mode=='w':
-                f.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Date'+ '|'+'Cantidad Citas' + '|' + 'Author' + '|' + 'AuthorID' + '|' + '\n')
+                #f.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Date'+ '|'+'Cantidad Citas' + '|' + 'Author' + '|' + 'AuthorID' + '|' + '\n')
+                f1.write('affiliationID' + '|'+ 'ScopusIDPub' + '|'+ 'AuthorID' + '\n')
+                f2.write('AuthorID' + '|' + 'Author' + '\n')
+                f3.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '\n')
+                f4.write('ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Date'+ '|'+'Cantidad Citas' + '\n')
                 c.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Date'+ '|'+'Cantidad Citas' + '|' + 'Author' + '|' + 'AuthorID' + '|' + '\n')
                 l.write('affiliationID' + '|'+ 'affilName' + '|'+ 'affilCity' + '|'+ 'affilCountry' + '|' + 'ScopusIDPub' + '|'+ 'TipoPub' + '|'+ 'Title' + '|' + 'Source'+ '|' +  'Date'+ '|'+'Cantidad Citas' + '|' + 'Author' + '|' + 'AuthorID' + '|' + '\n')
             
             fstring = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}|{scopusIDPub}|{tipoPub}|{title}|{source}|{date}|{cites}|{author}|{authorID}'
+            f1string = '{affiliationID}|{scopusIDPub}|{authorID}'
+            f2string = '{authorID}|{author}'
+            f3string = '{affiliationID}|{affilName}|{affilCity}|{affilCountry}'
+            f4string = '{scopusIDPub}|{tipoPub}|{title}|{source}|{date}|{cites}'
 
             if  len(scopusPubsIDs) > 0:  
                 i = 0
@@ -1016,6 +956,7 @@ def processPublications(scopusPubsIDs):
                     affName=''
                     affCity=''
                     affCountry=''
+                    scopusID=sid
 
                     # some entries seem to have json parse errors, so we catch those
                     try:
@@ -1025,154 +966,189 @@ def processPublications(scopusPubsIDs):
                         #results = abstractRetrievalAPI(str(sid[0]))  # index 0 because the input data is a 2d array     
                         results = abstractRetrievalAPI(str(sid))
 
-                        tipoPub = results['abstracts-retrieval-response']['coredata']['prism:aggregationType'];
-                        title=results['abstracts-retrieval-response']['coredata']['dc:title'].encode('utf-8');                        
-                        source=results['abstracts-retrieval-response']['coredata']['prism:publicationName'].encode('utf-8');                        
-                        date=results['abstracts-retrieval-response']['coredata']['prism:coverDate'].encode('utf-8');                        
-                        cites=int(results['abstracts-retrieval-response']['coredata']['citedby-count'].encode('utf-8'))    
+                        if results:
+                            if 'prism:aggregationType' in results['abstracts-retrieval-response']['coredata'].keys():
+                                tipoPub = results['abstracts-retrieval-response']['coredata']['prism:aggregationType'];
+                            if 'dc:title' in results['abstracts-retrieval-response']['coredata'].keys():
+                                title=results['abstracts-retrieval-response']['coredata']['dc:title'].encode('utf-8');
+                            if 'prism:publicationName' in results['abstracts-retrieval-response']['coredata'].keys():
+                                source=results['abstracts-retrieval-response']['coredata']['prism:publicationName'].encode('utf-8');
+                            if 'prism:coverDate' in results['abstracts-retrieval-response']['coredata'].keys():
+                                date=results['abstracts-retrieval-response']['coredata']['prism:coverDate'].encode('utf-8');
+                            if 'citedby-count' in results['abstracts-retrieval-response']['coredata'].keys():
+                                cites=int(results['abstracts-retrieval-response']['coredata']['citedby-count'].encode('utf-8'))                       
+                            
+                            affilID=''
+                            affiliation_city=''
+                            affilname=''
+                            affiliation_country=''
 
-                        affilID=''
-                        affiliation_city=''
-                        affilname=''
-                        affiliation_country=''
+                            listAffil=[]
+                            # Primero verificar que si se pudieron recuperar las afiliaciones
+                            if ('affiliation' in results['abstracts-retrieval-response'].keys()):
+                                if (type(results['abstracts-retrieval-response']['affiliation']) is dict):
+                                    listAffil.append(results['abstracts-retrieval-response']['affiliation'])
+                                else:
+                                    listAffil=results['abstracts-retrieval-response']['affiliation']
 
-                        listAffil=[]
-                        # Primero verificar que si se pudieron recuperar las afiliaciones
-                        if ('affiliation' in results['abstracts-retrieval-response'].keys()):
-                            if (type(results['abstracts-retrieval-response']['affiliation']) is dict):
-                                
-                                listAffil.append(results['abstracts-retrieval-response']['affiliation'])
+                                for affil in listAffil:
+
+                                    if affil['@id']==None:
+                                        affilID='No_Affil_ID'
+                                    else:
+                                        affilID = affil['@id'].encode('utf-8')
+
+                                    if affil['affiliation-city'] == None:
+                                        affiliation_city='No_Affil_City'
+                                    else:
+                                        affiliation_city = affil['affiliation-city'].encode('utf-8')
+
+                                    if affil['affilname'] == None:
+                                        affilname='No_Affil_Name'
+                                    else:
+                                        affilname = affil['affilname'].encode('utf-8')
+
+                                    if affil['affiliation-country'] == None:
+                                        affiliation_country='No_Affil_Country'
+                                    else:
+                                        affiliation_country = affil['affiliation-country'].encode('utf-8')
+
+                                    if affilCount.get(affilID) == None:
+                                        affilCount[affilID]=1
+                                        affilCity[affilID] = affiliation_city
+                                        affilCountry[affilID] = affiliation_country
+                                        affilName[affilID] = affilname
+                                    else:
+                                        affilCount[affilID]=affilCount[affilID]+1
+
                             else:
-                                listAffil=results['abstracts-retrieval-response']['affiliation']
-
-                            for affil in listAffil:
-
-                                if affil['@id']==None:
-                                    affilID='No_Affil_ID'
-                                else:
-                                    affilID = affil['@id'].encode('utf-8')
-
-                                if affil['affiliation-city'] == None:
-                                    affiliation_city='No_Affil_City'
-                                else:
-                                    affiliation_city = affil['affiliation-city'].encode('utf-8')
-
-                                if affil['affilname'] == None:
-                                    affilname='No_Affil_Name'
-                                else:
-                                    affilname = affil['affilname'].encode('utf-8')
-
-                                if affil['affiliation-country'] == None:
-                                    affiliation_country='No_Affil_Country'
-                                else:
-                                    affiliation_country = affil['affiliation-country'].encode('utf-8')
+                                affilID = 'No_Afilliation'
 
                                 if affilCount.get(affilID) == None:
                                     affilCount[affilID]=1
-                                    affilCity[affilID] = affiliation_city
-                                    affilCountry[affilID] = affiliation_country
-                                    affilName[affilID] = affilname
+                                    affilCity[affilID] = 'No_Affil_City'
+                                    affilCountry[affilID] = 'No_Affil_Country'
+                                    affilName[affilID] = 'No_Affil_Name'
                                 else:
                                     affilCount[affilID]=affilCount[affilID]+1
 
-                        else:
-                            affilID = 'No_Afilliation'
+                            # Process all the authors of the publication
+                            for au in results['abstracts-retrieval-response']['authors']['author']:
+                                author = ''
+                                authorID = ''
+                                affID = ''
+                                affName=''
+                                affCity=''
+                                affCountry=''
+                                affIDConcat = ''
+                                affCountryConcat= ''
+                                affCityConcat = ''
+                                affNameConcat = ''
+                                sameAffiliation = False
+                                author = au['ce:indexed-name'].encode('utf-8')
+                                authorID = au['@auid'].encode('utf-8')
 
-                            if affilCount.get(affilID) == None:
-                                affilCount[affilID]=1
-                                affilCity[affilID] = 'No_Affil_City'
-                                affilCountry[affilID] = 'No_Affil_Country'
-                                affilName[affilID] = 'No_Affil_Name'
-                            else:
-                                affilCount[affilID]=affilCount[affilID]+1
-
-                        # Process all the authors of the publication
-                        for au in results['abstracts-retrieval-response']['authors']['author']:
-                            author = ''
-                            authorID = ''
-                            affID = ''
-                            affName=''
-                            affCity=''
-                            affCountry=''
-                            affIDConcat = ''
-                            affCountryConcat= ''
-                            affCityConcat = ''
-                            affNameConcat = ''
-                            sameAffiliation = False
-                            author = au['ce:indexed-name'].encode('utf-8')
-                            authorID = au['@auid'].encode('utf-8')
-
-                            if ('affiliation' in au.keys()):
+                                if ('affiliation' in au.keys()):
                                     
-                                # Could have 1 (dictionary) or more affiliations (list of dictionaries)                                
-                                if (type(au['affiliation']) is dict):
-                                    
-                                    affID = au['affiliation']['@id']
-                                    affName =affilName[affID]
-                                    affCity=affilCity[affID]
-                                    affCountry=affilCountry[affID]
-                                    
-                                    if(affID in tecAffiliations):
+                                    # Could have 1 (dictionary) or more affiliations (list of dictionaries)                                
+                                    if (type(au['affiliation']) is dict):
                                         
-                                        sameAffiliation = True
-                                    
-                                elif type(au['affiliation']) is list:
-                                    for affIDs in au['affiliation']:
+                                        affID = au['affiliation']['@id']
 
-                                        affID = affIDs['@id']
+                                        if affID in affilName.keys():
+                                            # the author has an affiliation and it was also listed at ['abstracts-retrieval-response']['affiliation'].
+                                            affName =affilName[affID]
+                                            affCity=affilCity[affID]
+                                            affCountry=affilCountry[affID]
+                                        else:
+                                            # the author has an affiliation but it was not listed at ['abstracts-retrieval-response']['affiliation']
+                                            # TODO : to get the affiliation data, the affilAPI should be called.  The result should be handled
+                                            # results=affiliationSearchAPI(affID)
+                                            affCity = 'Affil_City_Not_Available'
+                                            affCountry = 'Affil_Country_Not_Available'
+                                            affName = 'Affil_Name_Not_Available'
 
-                                        if (affID in tecAffiliations):
+                                        if(affID in tecAffiliations):
                                             sameAffiliation = True
-                                            
-                                        if affIDConcat == '':
-                                            affIDConcat = affID
-                                        else:
-                                            affIDConcat =  affIDConcat + '#' + affID
+                                        
+                                    elif type(au['affiliation']) is list:
+                                        for affIDs in au['affiliation']:
 
-                                        if affCityConcat == '':
-                                            affCityConcat = affilCity[affID]
-                                        else:
-                                            affCityConcat =  affCityConcat + '#' + affilCity[affID]
+                                            affID = affIDs['@id']
 
-                                        if affCountryConcat == '':
-                                            affCountryConcat = affilCountry[affID]
-                                        else:
-                                            affCountryConcat =  affCountryConcat + '#' + affilCountry[affID]
+                                            if (affID in tecAffiliations):
+                                                sameAffiliation = True
+                                                
+                                            if affIDConcat == '':
+                                                affIDConcat = affID
+                                            else:
+                                                affIDConcat =  affIDConcat + '#' + affID
 
-                                        if affNameConcat == '':
-                                            affNameConcat = affilName[affID]
-                                        else:
-                                            affNameConcat =  affNameConcat + '#' + affilName[affID]
-                                    
-                                    affID = affIDConcat
-                                    affCountry=affCountryConcat
-                                    affCity=affCityConcat
-                                    affName=affNameConcat
-                          
-                            else:
-                                affID = 'No_Afilliation'
-                            
+                                            if affCityConcat == '':
+                                                affCityConcat = affilCity[affID]
+                                            else:
+                                                affCityConcat =  affCityConcat + '#' + affilCity[affID]
 
-                            s = fstring.format(affiliationID = affID,
-                                                 affilName = affName, 
-                                                 affilCity = affCity,
-                                                affilCountry = affCountry,
-                                                 scopusIDPub = scopusID,
-                                                     tipoPub = tipoPub,
-                                                        title=title,
-                                                      source=source,
-                                                         date=date,
-                                                        cites=cites,
-                                                       author=author,
-                                                     authorID=authorID)
-                            
-                            if (sameAffiliation):
-                                f.write(s +'\n')
-                            else:
-                                c.write(s +'\n')
+                                            if affCountryConcat == '':
+                                                affCountryConcat = affilCountry[affID]
+                                            else:
+                                                affCountryConcat =  affCountryConcat + '#' + affilCountry[affID]
+
+                                            if affNameConcat == '':
+                                                affNameConcat = affilName[affID]
+                                            else:
+                                                affNameConcat =  affNameConcat + '#' + affilName[affID]
+                                        
+                                        affID = affIDConcat
+                                        affCountry=affCountryConcat
+                                        affCity=affCityConcat
+                                        affName=affNameConcat
+                              
+                                else:
+                                    affID = 'No_Afilliation'
+                                
+                                # s = fstring.format(affiliationID=affID,
+                                #                        affilName=affName, 
+                                #                        affilCity=affCity,
+                                #                     affilCountry=affCountry,
+                                #                      scopusIDPub=scopusID,
+                                #                          tipoPub=tipoPub,
+                                #                            title=title,
+                                #                           source=source,
+                                #                             date=date,
+                                #                            cites=cites,
+                                #                           author=author,
+                                #                         authorID=authorID)
+                                s1 = f1string.format(affiliationID=affID,
+                                                      scopusIDPub=scopusID,
+                                                         authorID=authorID)
+                                s2 = f2string.format(authorID=authorID,
+                                                      author=author)
+                                s3 = f3string.format(affiliationID=affID,
+                                                        affilName=affName, 
+                                                        affilCity=affCity,
+                                                     affilCountry=affCountry)
+                                s4 = f4string.format(scopusIDPub=scopusID,
+                                                        tipoPub=tipoPub,
+                                                          title=title,
+                                                         source=source,
+                                                           date=date,
+                                                          cites=cites)
+
+                                
+                                #if (sameAffiliation):
+                                f1.write(s1 +'\n')
+                                f2.write(s2 +'\n')
+                                f3.write(s3 +'\n')
+                                f4.write(s4 +'\n')
+                                # else:
+                                #     c.write(s +'\n')
+                        else:
+                            if executionMode=="RUN":
+                                with open(logFile,"a") as log:
+                                    log.write('No existen datos sobre la publicacion: [%s] en abstractRetrievalAPI - [%s]\n' % (scopusID,time.strftime("%Y%m%d-%H%M%S")))
 
                     except:
-
                         s = fstring.format(affiliationID = affID,
                                    affilName = affName, 
                                    affilCity = affCity,
@@ -1191,7 +1167,7 @@ def processPublications(scopusPubsIDs):
         
         if executionMode=="RUN":
             with open(logFile,"a") as log:
-                log.write('Operation failed: %s - [%s]' % (e.strerror,time.strftime("%Y%m%d-%H%M%S")))
+                log.write('Operation failed: %s - [%s]\n' % (e.strerror,time.strftime("%Y%m%d-%H%M%S")))
 
     if executionMode=="DEBUG":
         with open(debugFilePath,"a") as debugFile:
@@ -1212,9 +1188,12 @@ def userInterface():
                         '2': ('Query 1', "query_1"),
                         '3': ('Query 2', "query_2"),
                         '4': ('Publicaciones con Afiliaciones TEC', "Pubs_Afil_TEC"),
-                        '5': ('Exit', "exit"),    
-                        '6': ('Inicializar variables', "init_variables"),
-                        '7': ('Inicializar limites API', "init_limits")}
+                        '5': ('Publicaciones con Afiliaciones TEC, sin filtro de fechas', "Pubs_Afil_TEC_sin"),
+                        '6': ('Publicaciones pasando los SCOPUS ID de las mismas', "Pubs_With_SCOPUSID"),
+                        '7': ('Autores con Afiliacion del Tec', "authorsTECAffil"),
+                        '8': ('Exit', "exit"),    
+                        '9': ('Inicializar variables', "init_variables"),
+                        '10': ('Inicializar limites API', "init_limits")}
                         
     response_func = make_choice(response_options)
 
@@ -1226,6 +1205,12 @@ def userInterface():
         optionHandler(3)
     elif response_func == "Pubs_Afil_TEC":
         optionHandler(4)
+    elif response_func == "Pubs_Afil_TEC_sin":
+        optionHandler(5)
+    elif response_func == "Pubs_With_SCOPUSID":
+        optionHandler(6)
+    elif response_func == "authorsTECAffil":
+        optionHandler(7)
     elif response_func == "exit":
         sys.exit()
     elif response_func == "init_variables":
@@ -1251,7 +1236,7 @@ def make_choice(optiontable):
     except KeyError:   
         if executionMode=="RUN":
             with open(logFile,"a") as log:
-                log.write("La opción ingresada no está en el menú: [%s] - [%s] " % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
+                log.write("La opción ingresada no está en el menú: [%s] - [%s]\n" % (sys._getframe().f_code.co_name, time.strftime("%Y%m%d-%H%M%S")))
     return result
 
 ##############################################################################################
@@ -1263,12 +1248,17 @@ def make_choice(optiontable):
 def unpackingConfigFileVariables():
 
     global outputPath
+    global scopublicaciones
+    global scoafiliaciones
+    global scoautores
+    global scopubbautafil
     global notProcessed
     global collab
     global summary
     global debugFilePath
     global logFile
-    global inputPath
+    global inputPathPubsIDs
+    global inputPathAuthorsIDs
     global MY_API_KEY
     global tecAffiliations
     global affiliationID
@@ -1285,12 +1275,18 @@ def unpackingConfigFileVariables():
     configParser.read(configFilePath)
 
     outputPath=configParser.get('FILES','outputPath')
+    scopublicaciones=configParser.get('FILES','scopublicaciones')
+    scoafiliaciones=configParser.get('FILES','scoafiliaciones')
+    scoautores=configParser.get('FILES','scoautores')
+    scopubbautafil=configParser.get('FILES','scopubbautafil')
+
     notProcessed=configParser.get('FILES','notProcessed')
     collab=configParser.get('FILES','collab')
     summary=configParser.get('FILES','summary')
     debugFilePath=configParser.get('FILES','debugFilePath')
     logFile=configParser.get('FILES','logFile')
-    inputPath=configParser.get('FILES','inputPath')
+    inputPathAuthorsIDs=configParser.get('FILES','inputPathAuthorsIDs')
+    inputPathPubsIDs=configParser.get('FILES','inputPathPubsIDs')
     MY_API_KEY=configParser.get('API_KEY','MY_API_KEY')
     tecAffiliations = configParser.get('VARIABLES','tecAffiliations').split(";")
     affiliationID=configParser.get('VARIABLES','affiliationID')
