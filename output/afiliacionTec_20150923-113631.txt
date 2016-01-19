@@ -1,2 +1,0 @@
-affiliationID|affilName|affilCity|affilCountry|ScopusIDPub|TipoPub|Title|Source|Date|Cantidad Citas|Author|AuthorID|
-60007966|Tecnologico de Monterrey|Monterrey|Mexico|84905893026|Book|Italian postwar neo-fascism: Three paths, one mission?|Analysing Fascist Discourse: European Fascism in Talk and Text|2013-12-01|0|Bar-On T.|8615870300

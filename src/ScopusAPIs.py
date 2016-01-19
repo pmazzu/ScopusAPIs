@@ -873,7 +873,7 @@ def getAmountOfPubsByAffilInaPeriod(idAffiliation,indexStr):
 
     while(morePublications):
         amountOfPubs=0
-        query = "AF-ID(" + idAffiliation + ")AND+PUBYEAR+>+"+yearFromStr+"AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr  
+        query = "AF-ID(" + idAffiliation + ")AND+PUBYEAR+>+"+yearFromStr+"+AND+PUBYEAR+<+"+yearToStr+"&field=dc:identifier&start="+indexStr+"&count="+frameSizeStr  
         results=scopusSearchAPI(query)
 
         if results:

@@ -1,0 +1,1 @@
+affiliationID|affilName|affilCity|affilCountry|ScopusIDPub|TipoPub|Title|Source|Date|Cantidad Citas|Author|AuthorID|

@@ -1,0 +1,40 @@
+affiliationID|affilName|affilCity|affilCountry
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60027950|Carnegie Mellon University|Pittsburgh|United States
+60016458#60007966|Jacobs University Bremen#Tecnologico de Monterrey|Bremen#Monterrey|Germany#Mexico
+60016458|Jacobs University Bremen|Bremen|Germany
+No_Afilliation|||
+No_Afilliation|||
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60016458|Jacobs University Bremen|Bremen|Germany
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60005837#60005837|University of Houston#University of Houston|Houston#Houston|United States#United States
+60005837#60005837#60009858|University of Houston#University of Houston#Methodist Research Institute|Houston#Houston#Indianapolis|United States#United States#United States
+60005837|University of Houston|Houston|United States
+60005837#60007966|University of Houston#Tecnologico de Monterrey|Houston#Monterrey|United States#Mexico
+60005837|University of Houston|Houston|United States
+60005837|University of Houston|Houston|United States
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60005837#60007966#60005837|University of Houston#Tecnologico de Monterrey#University of Houston|Houston#Monterrey#Houston|United States#Mexico#United States
+No_Afilliation|||
+No_Afilliation|||
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico
+60007966|Tecnologico de Monterrey|Monterrey|Mexico

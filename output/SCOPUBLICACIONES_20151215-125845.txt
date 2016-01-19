@@ -1,0 +1,40 @@
+ScopusIDPub|TipoPub|Title|Source|Date|Cantidad Citas
+84908330803|Journal|Insights on the downstream purification of fucoxanthin, a microalgal carotenoid, from an aqueous two-phase system stream exploiting ultrafiltration|Journal of Applied Phycology|2014-10-30|0
+84908330803|Journal|Insights on the downstream purification of fucoxanthin, a microalgal carotenoid, from an aqueous two-phase system stream exploiting ultrafiltration|Journal of Applied Phycology|2014-10-30|0
+84908330803|Journal|Insights on the downstream purification of fucoxanthin, a microalgal carotenoid, from an aqueous two-phase system stream exploiting ultrafiltration|Journal of Applied Phycology|2014-10-30|0
+84906782013|Journal|Separation of PEGylated variants of ribonuclease A and apo-α-lactalbumin via reversed phase chromatography|Journal of Chromatography A|2014-09-19|0
+84906782013|Journal|Separation of PEGylated variants of ribonuclease A and apo-α-lactalbumin via reversed phase chromatography|Journal of Chromatography A|2014-09-19|0
+84906782013|Journal|Separation of PEGylated variants of ribonuclease A and apo-α-lactalbumin via reversed phase chromatography|Journal of Chromatography A|2014-09-19|0
+84906782013|Journal|Separation of PEGylated variants of ribonuclease A and apo-α-lactalbumin via reversed phase chromatography|Journal of Chromatography A|2014-09-19|0
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84906721620|Journal|A novel pectin-degrading enzyme complex from Aspergillus sojae ATCC 20235 mutants|Journal of the Science of Food and Agriculture|2014-09-03|1
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84913580204|Journal|Microretroreflector-sedimentation immunoassays for pathogen detection|Analytical Chemistry|2014-09-01|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84891372264|Journal|Spermine Sepharose as a clustered-charge anion exchange adsorbent|Journal of Chromatography A|2014-01-10|0
+84910017901|Book Series|Aqueous two-phase system strategies for the recovery of proteins from plants|Methods in Molecular Biology|2014-01-01|1
+84910017901|Book Series|Aqueous two-phase system strategies for the recovery of proteins from plants|Methods in Molecular Biology|2014-01-01|1
+84905976401|Journal|Application of Aqueous Two-Phase Systems for the Recovery of Bioactive Low-Molecular Weight Compounds|Separation Science and Technology (Philadelphia)|2014-01-01|0
+84905976401|Journal|Application of Aqueous Two-Phase Systems for the Recovery of Bioactive Low-Molecular Weight Compounds|Separation Science and Technology (Philadelphia)|2014-01-01|0
+84905976401|Journal|Application of Aqueous Two-Phase Systems for the Recovery of Bioactive Low-Molecular Weight Compounds|Separation Science and Technology (Philadelphia)|2014-01-01|0
+84905976401|Journal|Application of Aqueous Two-Phase Systems for the Recovery of Bioactive Low-Molecular Weight Compounds|Separation Science and Technology (Philadelphia)|2014-01-01|0
+84897104001|Journal|Aqueous two-phase systems strategies to establish novel bioprocesses for stem cells recovery|Critical Reviews in Biotechnology|2014-01-01|3
+84897104001|Journal|Aqueous two-phase systems strategies to establish novel bioprocesses for stem cells recovery|Critical Reviews in Biotechnology|2014-01-01|3
